@@ -1,13 +1,26 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
 
-import { Container, Heading, SimpleGrid, Text, VStack } from "@chakra-ui/react";
-import ProductCard from "../components/ProductCard";
+import {
+  Container,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanel,
+  TabPanels,
+  useColorModeValue,
+} from "@chakra-ui/react";
 
 import { useProductStore } from "../store/product.store";
+import Library from "./Library";
+import SellingBooks from "./SellingBooks";
 
 function HomePage() {
   const { fetchProducts, products } = useProductStore();
+
+  const bgColor = useColorModeValue("gray.300", "gray.700");
+  const textColor = useColorModeValue("black", "white");
+  const activeBgColor = useColorModeValue("gray.700", "gray.400");
+  const activeTextColor = useColorModeValue("gray.200", "gray.800");
 
   useEffect(() => {
     fetchProducts();
@@ -15,41 +28,46 @@ function HomePage() {
 
   return (
     <Container maxW={"container.xl"}>
-      <VStack spacing={8}>
-        <Heading as={"h1"} size={"2xl"} mb={8}>
-          Current Books 🚀
-        </Heading>
-
-        <SimpleGrid
-          columns={{
-            base: 1,
-            md: 2,
-            lg: 3,
-          }}
-          spacing={10}
-          w={"full"}
+      <Tabs variant="enclosed">
+        <TabList
+          bg={bgColor}
+          justifyContent={"center"}
+          gap={6}
+          color={textColor}
+          p={2}
+          rounded="lg"
+          borderBottom="none"
         >
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </SimpleGrid>
-
-        {products.length === 0 && (
-          <Text fontSize={"xl"} textAlign={"center"} fontWeight={"bold"}>
-            No Books found ☹️
-            <Link to="/create">
-              {" "}
-              <Text
-                as={"span"}
-                color={"blue.400"}
-                _hover={{ textDecoration: "underline" }}
-              >
-                Store a Book
-              </Text>
-            </Link>
-          </Text>
-        )}
-      </VStack>
+          <Tab
+            paddingInline={10}
+            _selected={{
+              bg: activeBgColor,
+              color: activeTextColor,
+              borderBottomRadius: "6px",
+            }}
+          >
+            All Books
+          </Tab>
+          <Tab
+            paddingInline={10}
+            _selected={{
+              bg: activeBgColor,
+              color: activeTextColor,
+              borderBottomRadius: "6px",
+            }}
+          >
+            Sold Books
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <Library products={products} />
+          </TabPanel>
+          <TabPanel>
+            <SellingBooks />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Container>
   );
 }

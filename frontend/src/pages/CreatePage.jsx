@@ -1,25 +1,36 @@
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
   Container,
   Heading,
+  HStack,
+  IconButton,
   Input,
   useColorModeValue,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import { useProductStore } from "../store/product.store";
 
 function CreatePage() {
+  const [productAmount, setProductAmount] = useState(0);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
     imageURL: "",
+    amount: productAmount,
+    sold: false,
   });
+
   const { createProduct } = useProductStore();
 
   const toast = useToast();
+
+  useEffect(() => {
+    setNewProduct((prev) => ({ ...prev, amount: productAmount }));
+  }, [productAmount]);
 
   const handleAddProduct = async () => {
     const { success, message } = await createProduct(newProduct);
@@ -38,14 +49,20 @@ function CreatePage() {
         isClosable: true,
       });
     }
-    setNewProduct({ name: "", price: "", imageURL: "" });
+    setNewProduct({
+      name: "",
+      price: "",
+      imageURL: "",
+      amount: 0,
+    });
+    setProductAmount(0);
   };
 
   return (
     <Container maxW={"container.sm"}>
       <VStack spacing={8}>
         <Heading as={"h1"} size={"2xl"} mb={8}>
-          Store New Book
+          Add New Book
         </Heading>
 
         <Box
@@ -66,7 +83,7 @@ function CreatePage() {
             />
 
             <Input
-              placeholder={"Book Price PKR"}
+              placeholder={"Book Price (PKR)"}
               name={"price"}
               value={newProduct.price}
               onChange={(e) =>
@@ -82,6 +99,37 @@ function CreatePage() {
                 setNewProduct({ ...newProduct, imageURL: e.target.value })
               }
             />
+
+            <VStack gap={2}>
+              <p>Amount</p>
+              <HStack>
+                <IconButton
+                  icon={<FaMinus />}
+                  aria-label="minus-amount"
+                  colorScheme="gray"
+                  variant="solid"
+                  onClick={() => {
+                    if (productAmount > 0) setProductAmount(productAmount - 1);
+                  }}
+                />
+                <Input
+                  placeholder={"Amount"}
+                  name={"amount"}
+                  type="number"
+                  value={productAmount}
+                  onChange={(e) =>
+                    setNewProduct({ ...newProduct, amount: e.target.value - 1 })
+                  }
+                />
+                <IconButton
+                  icon={<FaPlus />}
+                  aria-label="Search"
+                  colorScheme="blue"
+                  variant="solid"
+                  onClick={() => setProductAmount(productAmount + 1)}
+                />
+              </HStack>
+            </VStack>
 
             <Button colorScheme={"blue"} w={"full"} onClick={handleAddProduct}>
               Add Product

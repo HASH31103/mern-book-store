@@ -98,13 +98,22 @@ function ProductCard({ product }) {
           Rs {product.price}
         </Text>
 
-        <HStack spacing={2}>
-          <IconButton icon={<EditIcon />} onClick={onOpen} colorScheme="blue" />
-          <IconButton
-            icon={<DeleteIcon />}
-            onClick={() => handleDelete(product._id)}
-            colorScheme="red"
-          />
+        <HStack justifyContent={"space-between"}>
+          <HStack spacing={2}>
+            <IconButton
+              icon={<EditIcon />}
+              onClick={onOpen}
+              colorScheme="blue"
+            />
+            <IconButton
+              icon={<DeleteIcon />}
+              onClick={() => handleDelete(product._id)}
+              colorScheme="red"
+            />
+          </HStack>
+          <Heading as={"h5"} size={"sm"}>
+            {product.amount} in stock
+          </Heading>
         </HStack>
       </Box>
 
