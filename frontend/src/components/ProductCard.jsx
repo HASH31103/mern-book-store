@@ -35,6 +35,11 @@ function ProductCard({ product }) {
     location: "",
   });
 
+  const [password, setPassword] = useState("");
+  const [authAction, setAuthAction] = useState(null);
+
+  const PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+
   const toast = useToast();
   const {
     isOpen: isEditOpen,
@@ -48,58 +53,68 @@ function ProductCard({ product }) {
     onClose: onSoldClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isPasswordOpen,
+    onOpen: onPasswordOpen,
+    onClose: onPasswordClose,
+  } = useDisclosure();
+
   const handleDelete = async (pid) => {
     const { success, message } = await deleteProduct(pid);
 
-    if (!success) {
-      toast({
-        title: "Error!",
-        description: message,
-        status: "error",
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "Success!",
-        description: message,
-        status: "success",
-        isClosable: true,
-      });
-    }
+    toast({
+      title: success ? "Success!" : "Error!",
+      description: message,
+      status: success ? "success" : "error",
+      isClosable: true,
+    });
   };
 
   const handleMarkAsSold = async (pid, product) => {
-    const updatedProduct = { ...product, sold: !product.sold, soldInfo };
-    await handleUpdate(pid, updatedProduct);
+    const updated = { ...product, sold: !product.sold, soldInfo };
+    await handleUpdate(pid, updated);
   };
 
   const handleUpdate = async (pid, product) => {
-    const { success, message } = await updateProduct(pid, product);
+    const { success } = await updateProduct(pid, product);
     onEditClose();
 
-    if (!success) {
+    toast({
+      title: success ? "Success!" : "Error!",
+      description: success ? "Book updated successfully" : "Update failed",
+      status: success ? "success" : "error",
+      isClosable: true,
+    });
+  };
+
+  const verifyPasswordAndProceed = () => {
+    if (password !== PASSWORD) {
       toast({
-        title: "Error!",
-        description: message,
+        title: "Access Denied",
+        description: "Incorrect password",
         status: "error",
         isClosable: true,
       });
-    } else {
-      toast({
-        title: "Success!",
-        description: "Book updated successfully",
-        status: "success",
-        isClosable: true,
-      });
+      return;
     }
+
+    if (authAction === "edit") {
+      onEditOpen();
+    } else if (authAction === "delete") {
+      handleDelete(product._id);
+    }
+
+    onPasswordClose();
+    setPassword("");
+    setAuthAction(null);
   };
 
   return (
     <Box
-      shadow={"lg"}
-      rounded={"lg"}
-      overflow={"hidden"}
-      transition={"all 0.3s"}
+      shadow="lg"
+      rounded="lg"
+      overflow="hidden"
+      transition="all 0.3s"
       _hover={{ transform: "translateY(-5px)", shadow: "xl" }}
       bg={bgColor}
     >
@@ -107,58 +122,63 @@ function ProductCard({ product }) {
         src={product.imageURL}
         alt={product.name}
         h={48}
-        w={"full"}
-        objectFit={"cover"}
+        w="full"
+        objectFit="cover"
       />
+
       <Box p={4}>
-        <Heading as={"h3"} size={"md"} mb={2}>
+        <Heading as="h3" size="md" mb={2}>
           {product.name}
         </Heading>
 
-        <Text fontWeight={"semibold"} fontSize={"xl"} color={textColor} mb={4}>
+        <Text fontWeight="semibold" fontSize="xl" color={textColor} mb={4}>
           Rs {product.price}
         </Text>
 
-        <HStack justifyContent={"space-between"}>
+        <HStack justifyContent="space-between">
           <HStack spacing={2}>
             <IconButton
               icon={<EditIcon />}
-              onClick={onEditOpen}
               colorScheme="blue"
+              onClick={() => {
+                setAuthAction("edit");
+                onPasswordOpen();
+              }}
             />
             <IconButton
               icon={<DeleteIcon />}
-              onClick={() => handleDelete(product._id)}
               colorScheme="red"
+              onClick={() => {
+                setAuthAction("delete");
+                onPasswordOpen();
+              }}
             />
           </HStack>
 
           <IconButton
             icon={<FaHandshake />}
-            onClick={onSoldOpen}
             colorScheme="green"
+            onClick={onSoldOpen}
           />
         </HStack>
       </Box>
 
+      {/* Edit Modal */}
       <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalContent>
           <ModalHeader>Update Product</ModalHeader>
           <ModalCloseButton />
-
           <ModalBody>
             <VStack spacing={4}>
               <Input
-                placeholder={"Book name"}
-                name={"name"}
+                placeholder="Book name"
                 value={updatedProduct.name}
                 onChange={(e) =>
                   setUpdatedProduct({ ...updatedProduct, name: e.target.value })
                 }
               />
               <Input
-                placeholder={"Book price"}
-                name={"price"}
+                placeholder="Book price"
                 value={updatedProduct.price}
                 onChange={(e) =>
                   setUpdatedProduct({
@@ -168,8 +188,7 @@ function ProductCard({ product }) {
                 }
               />
               <Input
-                placeholder={"Book imageURL"}
-                name={"imageURL"}
+                placeholder="Book imageURL"
                 value={updatedProduct.imageURL}
                 onChange={(e) =>
                   setUpdatedProduct({
@@ -184,42 +203,40 @@ function ProductCard({ product }) {
           <ModalFooter>
             <Button
               colorScheme="blue"
-              mr={3}
               onClick={() => handleUpdate(product._id, updatedProduct)}
             >
               Update
             </Button>
-
-            <Button variant={"ghost"} onClick={onEditClose}>
+            <Button variant="ghost" onClick={onEditClose}>
               Cancel
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
 
+      {/* Sold Modal */}
       <Modal isOpen={isSoldOpen} onClose={onSoldClose}>
         <ModalContent>
           <ModalHeader>Buyer Information</ModalHeader>
           <ModalCloseButton />
-
           <ModalBody>
             <VStack spacing={4}>
               <Input
-                placeholder={"Buyer name"}
+                placeholder="Buyer name"
                 value={soldInfo.name}
                 onChange={(e) =>
                   setSoldInfo({ ...soldInfo, name: e.target.value })
                 }
               />
               <Input
-                placeholder={"Buyer email"}
+                placeholder="Buyer email"
                 value={soldInfo.email}
                 onChange={(e) =>
                   setSoldInfo({ ...soldInfo, email: e.target.value })
                 }
               />
               <Input
-                placeholder={"Buyer location"}
+                placeholder="Buyer location"
                 value={soldInfo.location}
                 onChange={(e) =>
                   setSoldInfo({ ...soldInfo, location: e.target.value })
@@ -231,13 +248,35 @@ function ProductCard({ product }) {
           <ModalFooter>
             <Button
               colorScheme="blue"
-              mr={3}
               onClick={() => handleMarkAsSold(product._id, product)}
             >
               Mark as Sold
             </Button>
+            <Button variant="ghost" onClick={onSoldClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-            <Button variant={"ghost"} onClick={onSoldClose}>
+      {/* Shared Password Modal */}
+      <Modal isOpen={isPasswordOpen} onClose={onPasswordClose}>
+        <ModalContent>
+          <ModalHeader>Enter Password</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" onClick={verifyPasswordAndProceed}>
+              Submit
+            </Button>
+            <Button variant="ghost" onClick={onPasswordClose}>
               Cancel
             </Button>
           </ModalFooter>
