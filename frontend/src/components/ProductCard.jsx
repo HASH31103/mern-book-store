@@ -29,9 +29,24 @@ function ProductCard({ product }) {
 
   const { deleteProduct, updateProduct } = useProductStore();
   const [updatedProduct, setUpdatedProduct] = useState(product);
+  const [soldInfo, setSoldInfo] = useState({
+    name: "",
+    email: "",
+    location: "",
+  });
 
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isEditOpen,
+    onOpen: onEditOpen,
+    onClose: onEditClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isSoldOpen,
+    onOpen: onSoldOpen,
+    onClose: onSoldClose,
+  } = useDisclosure();
 
   const handleDelete = async (pid) => {
     const { success, message } = await deleteProduct(pid);
@@ -54,13 +69,13 @@ function ProductCard({ product }) {
   };
 
   const handleMarkAsSold = async (pid, product) => {
-    const updatedProduct = { ...product, sold: !product.sold };
+    const updatedProduct = { ...product, sold: !product.sold, soldInfo };
     await handleUpdate(pid, updatedProduct);
   };
 
   const handleUpdate = async (pid, product) => {
     const { success, message } = await updateProduct(pid, product);
-    onClose();
+    onEditClose();
 
     if (!success) {
       toast({
@@ -108,7 +123,7 @@ function ProductCard({ product }) {
           <HStack spacing={2}>
             <IconButton
               icon={<EditIcon />}
-              onClick={onOpen}
+              onClick={onEditOpen}
               colorScheme="blue"
             />
             <IconButton
@@ -117,19 +132,16 @@ function ProductCard({ product }) {
               colorScheme="red"
             />
           </HStack>
-          {/* <Heading as={"h5"} size={"sm"}>
-            {product.amount} in stock
-          </Heading> */}
 
           <IconButton
             icon={<FaHandshake />}
-            onClick={() => handleMarkAsSold(product._id, product)}
+            onClick={onSoldOpen}
             colorScheme="green"
           />
         </HStack>
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isEditOpen} onClose={onEditClose}>
         <ModalContent>
           <ModalHeader>Update Product</ModalHeader>
           <ModalCloseButton />
@@ -178,7 +190,54 @@ function ProductCard({ product }) {
               Update
             </Button>
 
-            <Button variant={"ghost"} onClick={onClose}>
+            <Button variant={"ghost"} onClick={onEditClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isSoldOpen} onClose={onSoldClose}>
+        <ModalContent>
+          <ModalHeader>Buyer Information</ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody>
+            <VStack spacing={4}>
+              <Input
+                placeholder={"Buyer name"}
+                value={soldInfo.name}
+                onChange={(e) =>
+                  setSoldInfo({ ...soldInfo, name: e.target.value })
+                }
+              />
+              <Input
+                placeholder={"Buyer email"}
+                value={soldInfo.email}
+                onChange={(e) =>
+                  setSoldInfo({ ...soldInfo, email: e.target.value })
+                }
+              />
+              <Input
+                placeholder={"Buyer location"}
+                value={soldInfo.location}
+                onChange={(e) =>
+                  setSoldInfo({ ...soldInfo, location: e.target.value })
+                }
+              />
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => handleMarkAsSold(product._id, product)}
+            >
+              Mark as Sold
+            </Button>
+
+            <Button variant={"ghost"} onClick={onSoldClose}>
               Cancel
             </Button>
           </ModalFooter>

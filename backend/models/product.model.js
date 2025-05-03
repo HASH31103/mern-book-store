@@ -14,13 +14,14 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    amount: {
-      type: Number,
-      required: true,
-    },
     sold: {
       type: Boolean,
       required: true,
+    },
+    soldInfo: {
+      name: String,
+      email: String,
+      location: String,
     },
   },
   {

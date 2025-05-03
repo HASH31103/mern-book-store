@@ -4,33 +4,24 @@ import {
   Button,
   Container,
   Heading,
-  HStack,
-  IconButton,
   Input,
   useColorModeValue,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { FaMinus, FaPlus } from "react-icons/fa";
 import { useProductStore } from "../store/product.store";
 
 function CreatePage() {
-  const [productAmount, setProductAmount] = useState(0);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
     imageURL: "",
-    amount: productAmount,
     sold: false,
   });
 
   const { createProduct } = useProductStore();
 
   const toast = useToast();
-
-  useEffect(() => {
-    setNewProduct((prev) => ({ ...prev, amount: productAmount }));
-  }, [productAmount]);
 
   const handleAddProduct = async () => {
     const { success, message } = await createProduct(newProduct);
@@ -53,9 +44,7 @@ function CreatePage() {
       name: "",
       price: "",
       imageURL: "",
-      amount: 0,
     });
-    setProductAmount(0);
   };
 
   return (
@@ -99,37 +88,6 @@ function CreatePage() {
                 setNewProduct({ ...newProduct, imageURL: e.target.value })
               }
             />
-
-            <VStack gap={2}>
-              <p>Amount</p>
-              <HStack>
-                <IconButton
-                  icon={<FaMinus />}
-                  aria-label="minus-amount"
-                  colorScheme="gray"
-                  variant="solid"
-                  onClick={() => {
-                    if (productAmount > 0) setProductAmount(productAmount - 1);
-                  }}
-                />
-                <Input
-                  placeholder={"Amount"}
-                  name={"amount"}
-                  type="number"
-                  value={productAmount}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, amount: e.target.value - 1 })
-                  }
-                />
-                <IconButton
-                  icon={<FaPlus />}
-                  aria-label="Search"
-                  colorScheme="blue"
-                  variant="solid"
-                  onClick={() => setProductAmount(productAmount + 1)}
-                />
-              </HStack>
-            </VStack>
 
             <Button colorScheme={"blue"} w={"full"} onClick={handleAddProduct}>
               Add Product

@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import { SimpleGrid, Text, VStack } from "@chakra-ui/react";
-import ProductCard from "../components/ProductCard";
+import SoldProductCard from "../components/SoldProductCard";
 
 export default function SoldBooks({ products }) {
   return (
@@ -17,7 +16,7 @@ export default function SoldBooks({ products }) {
         {products
           .filter((product) => product.sold)
           .map((product) => (
-            <ProductCard key={product._id} product={product} />
+            <SoldProductCard key={product._id} product={product} />
           ))}
       </SimpleGrid>
 
