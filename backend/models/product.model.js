@@ -18,6 +18,10 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    sold: {
+      type: Boolean,
+      required: true,
+    },
   },
   {
     timestamps: true, // createdAt, updatedAt

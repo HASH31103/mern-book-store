@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { SimpleGrid, Text, VStack } from "@chakra-ui/react";
 import ProductCard from "../components/ProductCard";
 
-export default function Library({ products }) {
+export default function SoldBooks({ products }) {
   return (
     <VStack spacing={8}>
       <SimpleGrid
@@ -15,24 +15,15 @@ export default function Library({ products }) {
         w={"full"}
       >
         {products
-          .filter((product) => !product.sold)
+          .filter((product) => product.sold)
           .map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
       </SimpleGrid>
 
-      {products.filter((product) => !product.sold).length === 0 && (
+      {products.filter((product) => product.sold).length === 0 && (
         <Text fontSize={"xl"} textAlign={"center"} fontWeight={"bold"}>
-          No Books found ☹️ <br />
-          <Link to="/create">
-            <Text
-              as={"span"}
-              color={"blue.400"}
-              _hover={{ textDecoration: "underline" }}
-            >
-              Store a Book
-            </Text>
-          </Link>
+          No Books Marked For Sale ☹️ <br />
         </Text>
       )}
     </VStack>

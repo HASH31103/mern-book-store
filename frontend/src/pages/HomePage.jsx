@@ -12,7 +12,7 @@ import {
 
 import { useProductStore } from "../store/product.store";
 import Library from "./Library";
-import SellingBooks from "./SellingBooks";
+import SoldBooks from "./SoldBooks";
 
 function HomePage() {
   const { fetchProducts, products } = useProductStore();
@@ -64,7 +64,7 @@ function HomePage() {
             <Library products={products} />
           </TabPanel>
           <TabPanel>
-            <SellingBooks />
+            <SoldBooks products={products} />
           </TabPanel>
         </TabPanels>
       </Tabs>

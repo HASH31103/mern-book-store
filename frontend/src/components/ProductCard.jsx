@@ -21,6 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { useProductStore } from "../store/product.store";
 import { useState } from "react";
+import { FaHandshake } from "react-icons/fa";
 
 function ProductCard({ product }) {
   const textColor = useColorModeValue("gray.600", "gray.200");
@@ -50,6 +51,11 @@ function ProductCard({ product }) {
         isClosable: true,
       });
     }
+  };
+
+  const handleMarkAsSold = async (pid, product) => {
+    const updatedProduct = { ...product, sold: !product.sold };
+    await handleUpdate(pid, updatedProduct);
   };
 
   const handleUpdate = async (pid, product) => {
@@ -111,9 +117,15 @@ function ProductCard({ product }) {
               colorScheme="red"
             />
           </HStack>
-          <Heading as={"h5"} size={"sm"}>
+          {/* <Heading as={"h5"} size={"sm"}>
             {product.amount} in stock
-          </Heading>
+          </Heading> */}
+
+          <IconButton
+            icon={<FaHandshake />}
+            onClick={() => handleMarkAsSold(product._id, product)}
+            colorScheme="green"
+          />
         </HStack>
       </Box>
 
