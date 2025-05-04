@@ -1,6 +1,6 @@
 # Book Store App (MERN Stack)
 
-A simple MERN app to manage books inventory with fields like name, price, image, amount, and sold count.
+A simple MERN app to manage books inventory with fields like name, price, image, and seller data.
 
 ## Features
 
